@@ -256,3 +256,12 @@ class mtf:
         plt.grid()
         plt.legend()
         plt.savefig(f"{directory}/MTF_ACT_{band}.png", dpi=300)
+
+        # Report the Nyquist frequency in a .txt file
+        nyquist_file = os.path.join(directory, 'nyquist.txt')
+        mode = 'w' if band == 'VNIR-0' else 'a'
+
+        with open(nyquist_file, mode) as nyquist:
+            nyquist.write(f"{band}\n")
+            nyquist.write(f"Nyquist frequency ALT={Hsys[pixel_ALT, 0]}\n")
+            nyquist.write(f"Nyquist frequency ACT={Hsys[0, pixel_ACT]}\n")
