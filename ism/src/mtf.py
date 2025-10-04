@@ -217,4 +217,26 @@ class mtf:
         """
         #TODO
 
+        # Calculate the central pixels across and along track
+        pixel_ALT = int(np.floor(fnAlt.shape[0]/2))
+        pixel_ACT = int(np.floor(fnAct.shape[0]/2))
 
+        # PLOT along track
+        figure = plt.figure(figsize=(20, 10))
+        x_axis = np.abs(fnAlt[0:pixel_ALT]) # The x axis are the frequencies in ALT direction for all the plots
+        plt.plot(x_axis, Hdiff[0:pixel_ALT, pixel_ACT], label="Diffraction MTF")
+        plt.plot(x_axis, Hdefoc[0:pixel_ALT, pixel_ACT], label="Defocus MTF")
+        plt.plot(x_axis, Hwfe[0:pixel_ALT, pixel_ACT], label="WFE Aberrations MTF")
+        plt.plot(x_axis, Hdet[0:pixel_ALT, pixel_ACT], label="Detector MTF")
+        plt.plot(x_axis, Hsmear[0:pixel_ALT, pixel_ACT], label="Smearing MTF")
+        plt.plot(x_axis, Hmotion[0:pixel_ALT, pixel_ACT], label="Motion blur MTF")
+        plt.plot(x_axis, Hsys[0:pixel_ALT, pixel_ACT], label="System MTF")
+        plt.axvline(0.5, color='k', linestyle='--', label='f Nyquist')
+        plt.title("System MTF - slice ALT for "+band)
+        plt.xlabel("Spatial frequencies f/(1/w) [-]")
+        plt.ylabel("MTF")
+        plt.grid()
+        plt.legend()
+        plt.savefig(f"{directory}/MTF_ALT_{band}.png", dpi=300)
+
+        # PLOT across track
