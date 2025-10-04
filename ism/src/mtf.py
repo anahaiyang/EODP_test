@@ -222,15 +222,15 @@ class mtf:
         pixel_ACT = int(np.floor(fnAct.shape[0]/2))
 
         # PLOT along track
-        figure = plt.figure(figsize=(20, 10))
-        x_axis = np.abs(fnAlt[0:pixel_ALT]) # The x axis are the frequencies in ALT direction for all the plots
-        plt.plot(x_axis, Hdiff[0:pixel_ALT, pixel_ACT], label="Diffraction MTF")
-        plt.plot(x_axis, Hdefoc[0:pixel_ALT, pixel_ACT], label="Defocus MTF")
-        plt.plot(x_axis, Hwfe[0:pixel_ALT, pixel_ACT], label="WFE Aberrations MTF")
-        plt.plot(x_axis, Hdet[0:pixel_ALT, pixel_ACT], label="Detector MTF")
-        plt.plot(x_axis, Hsmear[0:pixel_ALT, pixel_ACT], label="Smearing MTF")
-        plt.plot(x_axis, Hmotion[0:pixel_ALT, pixel_ACT], label="Motion blur MTF")
-        plt.plot(x_axis, Hsys[0:pixel_ALT, pixel_ACT], label="System MTF")
+        plt.figure(figsize=(10, 5))
+        x_ALT = np.abs(fnAlt[0:pixel_ALT]) # The x axis are the frequencies in ALT direction for all the plots
+        plt.plot(x_ALT, Hdiff[0:pixel_ALT, pixel_ACT], label="Diffraction MTF")
+        plt.plot(x_ALT, Hdefoc[0:pixel_ALT, pixel_ACT], label="Defocus MTF")
+        plt.plot(x_ALT, Hwfe[0:pixel_ALT, pixel_ACT], label="WFE Aberrations MTF")
+        plt.plot(x_ALT, Hdet[0:pixel_ALT, pixel_ACT], label="Detector MTF")
+        plt.plot(x_ALT, Hsmear[0:pixel_ALT, pixel_ACT], label="Smearing MTF")
+        plt.plot(x_ALT, Hmotion[0:pixel_ALT, pixel_ACT], label="Motion blur MTF")
+        plt.plot(x_ALT, Hsys[0:pixel_ALT, pixel_ACT], label="System MTF")
         plt.axvline(0.5, color='k', linestyle='--', label='f Nyquist')
         plt.title("System MTF - slice ALT for "+band)
         plt.xlabel("Spatial frequencies f/(1/w) [-]")
@@ -240,3 +240,19 @@ class mtf:
         plt.savefig(f"{directory}/MTF_ALT_{band}.png", dpi=300)
 
         # PLOT across track
+        plt.figure(figsize=(10, 5))
+        x_ACT = np.abs(fnAct[0:pixel_ACT])  # The x axis are the frequencies in ACT direction for all the plots
+        plt.plot(x_ACT, Hdiff[pixel_ALT, 0:pixel_ACT], label="Diffraction MTF")
+        plt.plot(x_ACT, Hdefoc[pixel_ALT, 0:pixel_ACT], label="Defocus MTF")
+        plt.plot(x_ACT, Hwfe[pixel_ALT, 0:pixel_ACT], label="WFE Aberrations MTF")
+        plt.plot(x_ACT, Hdet[pixel_ALT, 0:pixel_ACT], label="Detector MTF")
+        plt.plot(x_ACT, Hsmear[pixel_ALT, 0:pixel_ACT], label="Smearing MTF")
+        plt.plot(x_ACT, Hmotion[pixel_ALT, 0:pixel_ACT], label="Motion blur MTF")
+        plt.plot(x_ACT, Hsys[pixel_ALT, 0:pixel_ACT], label="System MTF")
+        plt.axvline(0.5, color='k', linestyle='--', label='f Nyquist')
+        plt.title("System MTF - slice ACT for " + band)
+        plt.xlabel("Spatial frequencies f/(1/w) [-]")
+        plt.ylabel("MTF")
+        plt.grid()
+        plt.legend()
+        plt.savefig(f"{directory}/MTF_ACT_{band}.png", dpi=300)
