@@ -41,10 +41,10 @@ class opticalPhase(initIsm):
         # Radiance to Irradiance conversion
         # -------------------------------------------------------------------------------
         self.logger.info("EODP-ALG-ISM-1020: Radiances to Irradiances")
-        toa = self.rad2Irrad(toa,
-                             self.ismConfig.D,
-                             self.ismConfig.f,
-                             self.ismConfig.Tr)
+        toa, rad2irrad_factor = self.rad2Irrad(toa,
+                                               self.ismConfig.D,
+                                               self.ismConfig.f,
+                                               self.ismConfig.Tr)
 
         self.logger.debug("TOA [0,0] " +str(toa[0,0]) + " [e-]")
 
@@ -81,7 +81,7 @@ class opticalPhase(initIsm):
             saveas_str = saveas_str + '_alt' + str(idalt)
             plotF([], toa[idalt,:], title_str, xlabel_str, ylabel_str, self.outdir, saveas_str)
 
-        return toa
+        return toa , rad2irrad_factor
 
     def rad2Irrad(self, toa, D, f, Tr):
         """
@@ -95,8 +95,9 @@ class opticalPhase(initIsm):
         # TODO
 
         toa = Tr * toa * ((np.pi)/4) * (D/f)**2
+        rad2irrad_factor = Tr * ((np.pi)/4) * (D/f)**2
 
-        return toa
+        return toa, rad2irrad_factor
 
 
     def applySysMtf(self, toa, Hsys):

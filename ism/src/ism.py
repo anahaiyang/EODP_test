@@ -21,6 +21,8 @@ class ism(initIsm):
         # -------------------------------------------------------------------------------
         sgm_toa, sgm_wv = readCube(self.indir, self.globalConfig.scene)
 
+        rad2irrad_factor_list = []
+
         for band in self.globalConfig.bands:
 
             self.logger.info("Start of BAND " + band)
@@ -28,7 +30,9 @@ class ism(initIsm):
             # Optical Phase
             # -------------------------------------------------------------------------------
             myOpt = opticalPhase(self.auxdir, self.indir, self.outdir)
-            toa = myOpt.compute(sgm_toa, sgm_wv, band)
+            toa, rad2irrad_factor = myOpt.compute(sgm_toa, sgm_wv, band)
+
+            rad2irrad_factor_list.append(rad2irrad_factor)
 
             # # Detection Stage
             # # -------------------------------------------------------------------------------
@@ -47,5 +51,7 @@ class ism(initIsm):
             self.logger.info("End of BAND " + band)
 
         self.logger.info("End of the Instrument Module!")
+
+        return rad2irrad_factor_list
 
 
