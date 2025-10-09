@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 bands_list = ['VNIR-0','VNIR-1','VNIR-2','VNIR-3']
-
+############### OPTICAL PHASE TEST ###############
 ## CHECK FOR ALL BANDS THAT THE DIFFERENCES WITH RESPECT TO THE OUTPUT TOA (ism_toa_isrf) ARE <0.01% FOR AT LEAST 3-SIGMA OF THE POINTS
 sigma_isrf = []
 for band in bands_list:
@@ -42,3 +42,11 @@ rad2irrad_factor = compute_ism.processModule()
 
 for band in bands_list:
     print(f"Radiance to irradiance conversion factor for {band} = {rad2irrad_factor[bands_list.index(band)]}")
+
+
+
+##############################################
+
+############### VIDEO CHAIN PHASE TEST ###############
+## CHECK FOR ALL BANDS THAT THE DIFFERENCES WITH RESPECT TO THE OUTPUT TOA (ism_toa_) ARE <0.01% FOR AT LEAST 3-SIGMA OF THE POINTS
+
