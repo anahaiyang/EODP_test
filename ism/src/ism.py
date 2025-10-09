@@ -34,15 +34,15 @@ class ism(initIsm):
 
             rad2irrad_factor_list.append(rad2irrad_factor)
 
-            # # Detection Stage
-            # # -------------------------------------------------------------------------------
-            # myDet = detectionPhase(self.auxdir, self.indir, self.outdir)
-            # toa = myDet.compute(toa, band)
-            #
-            # # Video Chain Phase
-            # # -------------------------------------------------------------------------------
-            # myVcu = videoChainPhase(self.auxdir, self.indir, self.outdir)
-            # toa = myVcu.compute(toa, band)
+            # Detection Stage
+            # -------------------------------------------------------------------------------
+            myDet = detectionPhase(self.auxdir, self.indir, self.outdir)
+            toa = myDet.compute(toa, band)
+
+            # Video Chain Phase
+            # -------------------------------------------------------------------------------
+            myVcu = videoChainPhase(self.auxdir, self.indir, self.outdir)
+            toa = myVcu.compute(toa, band)
 
             # Write output TOA
             # -------------------------------------------------------------------------------
