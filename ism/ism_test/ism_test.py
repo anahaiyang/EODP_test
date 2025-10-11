@@ -50,3 +50,13 @@ for band in bands_list:
 ############### VIDEO CHAIN PHASE TEST ###############
 ## CHECK FOR ALL BANDS THAT THE DIFFERENCES WITH RESPECT TO THE OUTPUT TOA (ism_toa_) ARE <0.01% FOR AT LEAST 3-SIGMA OF THE POINTS
 
+sigma_video = []
+for band in bands_list:
+    toa_video = readToa("D:\\MASTER UC3M\\EARTH OBSERVATION DATA PROCESSING\\EODP_TER_2021\\EODP-TS-ISM\\output", "ism_toa_"+ band +".nc")
+    mytoa_video = readToa("D:\\MASTER UC3M\\EARTH OBSERVATION DATA PROCESSING\\EODP_TER_2021\\EODP-TS-ISM\\myoutput", "ism_toa_"+ band +".nc")
+
+    div = toa_video != 0 # avoid NaN when dividing by zero
+    abs_diff = np.abs((toa_video[div] - mytoa_video[div]) / toa_video[div])
+    sigma = np.percentile(abs_diff,99.7)
+    sigma_video.append(f"ISM_TOA_ Sigma for {band} = {sigma}")
+print("\n".join(sigma_video))
