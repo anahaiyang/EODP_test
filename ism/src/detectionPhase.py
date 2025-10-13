@@ -4,6 +4,7 @@ import numpy as np
 from common.io.writeToa import writeToa
 from common.plot.plotMat2D import plotMat2D
 from common.plot.plotF import plotF
+import os
 
 class detectionPhase(initIsm):
 
@@ -14,7 +15,7 @@ class detectionPhase(initIsm):
         np.random.seed(self.ismConfig.seed)
 
 
-    def compute(self, toa, band):
+    def compute(self, toa, band, directory):
 
         self.logger.info("EODP-ALG-ISM-2000: Detection stage")
 
@@ -22,14 +23,14 @@ class detectionPhase(initIsm):
         # -------------------------------------------------------------------------------
         self.logger.info("EODP-ALG-ISM-2010: Irradiances to Photons")
         area_pix = self.ismConfig.pix_size * self.ismConfig.pix_size # [m2]
-        toa = self.irrad2Phot(toa, area_pix, self.ismConfig.t_int, self.ismConfig.wv[int(band[-1])])
+        toa = self.irrad2Phot(toa, area_pix, self.ismConfig.t_int, self.ismConfig.wv[int(band[-1])], band, directory)
 
         self.logger.debug("TOA [0,0] " +str(toa[0,0]) + " [ph]")
 
         # Photon to electrons conversion
         # -------------------------------------------------------------------------------
         self.logger.info("EODP-ALG-ISM-2030: Photons to Electrons")
-        toa = self.phot2Electr(toa, self.ismConfig.QE)
+        toa = self.phot2Electr(toa, self.ismConfig.QE, band, directory)
 
         self.logger.debug("TOA [0,0] " +str(toa[0,0]) + " [e-]")
 
@@ -95,7 +96,7 @@ class detectionPhase(initIsm):
         return toa
 
 
-    def irrad2Phot(self, toa, area_pix, tint, wv):
+    def irrad2Phot(self, toa, area_pix, tint, wv, band, directory):
         """
         Conversion of the input Irradiances to Photons
         :param toa: input TOA in irradiances [mW/m2]
@@ -114,9 +115,18 @@ class detectionPhase(initIsm):
 
         toa_ph = E_in / E_ph
 
+        irrad2Phot_factor = (area_pix * tint) / E_ph
+
+        # Report the irrad2Phot factor in a .txt file
+        conversion_factors_file = os.path.join(directory, 'conversion_factors.txt')
+        mode = 'w' if band == 'VNIR-0' else 'a'
+
+        with open(conversion_factors_file, mode) as conversion:
+            conversion.write(f"{band} Irradiance to photons factor = {irrad2Phot_factor}\n")
+
         return toa_ph
 
-    def phot2Electr(self, toa, QE):
+    def phot2Electr(self, toa, QE, band, directory):
         """
         Conversion of photons to electrons
         :param toa: input TOA in photons [ph]
@@ -126,6 +136,14 @@ class detectionPhase(initIsm):
         #TODO
 
         toae = toa * QE
+
+        # Report the phot2Electr factor in a .txt file
+        conversion_factors_file = os.path.join(directory, 'conversion_factors.txt')
+        mode = 'a'
+
+        with open(conversion_factors_file, mode) as conversion:
+            conversion.write(f"{band} Photons to electrons factor = {QE}\n")
+
         return toae
 
     def badDeadPixels(self, toa,bad_pix,dead_pix,bad_pix_red,dead_pix_red):

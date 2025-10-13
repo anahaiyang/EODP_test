@@ -3,13 +3,14 @@ from ism.src.initIsm import initIsm
 import numpy as np
 from common.plot.plotMat2D import plotMat2D
 from common.plot.plotF import plotF
+import os
 
 class videoChainPhase(initIsm):
 
     def __init__(self, auxdir, indir, outdir):
         super().__init__(auxdir, indir, outdir)
 
-    def compute(self, toa, band):
+    def compute(self, toa, band, directory):
         self.logger.info("EODP-ALG-ISM-3000: Video Chain")
 
         # Electrons to Voltage - read-out & amplification
@@ -17,7 +18,9 @@ class videoChainPhase(initIsm):
         self.logger.info("EODP-ALG-ISM-3010: Electrons to Voltage – Read-out and Amplification")
         toa = self.electr2Volt(toa,
                          self.ismConfig.OCF,
-                         self.ismConfig.ADC_gain)
+                         self.ismConfig.ADC_gain,
+                               band,
+                               directory)
 
         self.logger.debug("TOA [0,0] " +str(toa[0,0]) + " [V]")
 
@@ -27,7 +30,9 @@ class videoChainPhase(initIsm):
         toa = self.digitisation(toa,
                           self.ismConfig.bit_depth,
                           self.ismConfig.min_voltage,
-                          self.ismConfig.max_voltage)
+                          self.ismConfig.max_voltage,
+                                band,
+                                directory)
 
         self.logger.debug("TOA [0,0] " +str(toa[0,0]) + " [DN]")
 
@@ -45,7 +50,7 @@ class videoChainPhase(initIsm):
 
         return toa
 
-    def electr2Volt(self, toa, OCF, gain_adc):
+    def electr2Volt(self, toa, OCF, gain_adc, band, directory):
         """
         Electron to Volts conversion.
         Simulates the read-out and the amplification
@@ -58,9 +63,19 @@ class videoChainPhase(initIsm):
         #TODO
 
         toa = toa * OCF * gain_adc
+
+        electr2Volt_factor = OCF * gain_adc
+
+        # Report the electr2Volt factor in a .txt file
+        conversion_factors_file = os.path.join(directory, 'conversion_factors.txt')
+        mode = 'a'
+
+        with open(conversion_factors_file, mode) as conversion:
+            conversion.write(f"{band} Electrons to Volts factor = {electr2Volt_factor}\n")
+
         return toa
 
-    def digitisation(self, toa, bit_depth, min_voltage, max_voltage):
+    def digitisation(self, toa, bit_depth, min_voltage, max_voltage, band, directory):
         """
         Digitisation - conversion from Volts to Digital counts
         :param toa: input toa in [V]
@@ -70,7 +85,37 @@ class videoChainPhase(initIsm):
         :return: toa in digital counts
         """
         #TODO
-        sat_value = (2**bit_depth - 1)
         toa_dn = np.round((toa /(max_voltage - min_voltage)) * (2**bit_depth - 1))
+
+        digitalisation_factor = 1/(max_voltage - min_voltage) * (2**bit_depth - 1)
+
+        # Report the digitalisation factor in a .txt file
+        conversion_factors_file = os.path.join(directory, 'conversion_factors.txt')
+        mode = 'a'
+
+        with open(conversion_factors_file, mode) as conversion:
+            conversion.write(f"{band} Volts to digital numbers factor = {digitalisation_factor}\n")
+            conversion.write("\n")
+
+
+        # Saturated pixels
+        sat_value = (2 ** bit_depth - 1)
+
+        sat_count = 0
+        for i in range(toa_dn.shape[0]):
+            for j in range(toa_dn.shape[1]):
+                if toa_dn[i,j] > sat_value:
+                    sat_count += 1
+                    toa_dn[i,j] = sat_value
+
+        saturated_pixels_percentage = (sat_count/toa_dn.size) * 100
+
+        # Report the percentage of saturated pixels in a .txt file
+        saturated_pixels_file = os.path.join(directory, 'saturated_pixels.txt')
+        mode = 'w' if band == 'VNIR-0' else 'a'
+
+        with open(saturated_pixels_file, mode) as saturated:
+            saturated.write(f"{band} Percentage of saturated pixels = {saturated_pixels_percentage}\n")
+
         return toa_dn
 
