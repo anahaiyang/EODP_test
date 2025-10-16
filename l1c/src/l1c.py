@@ -67,9 +67,9 @@ class l1c(initL1c):
         m = mgrs.MGRS()
         mgrs_tiles = set([])
 
-        for ialt in range(lat.shape[0]):
-            for iact in range(lon.shape[1]):
-                mgrs_tiles.add(m.toMGRS(lat[ialt,iact], lon[ialt,iact], True, self.l1cConfig.mgrs_tile_precision))
+        for i in range(lat.shape[0]):
+            for j in range(lon.shape[1]):
+                mgrs_tiles.add(m.toMGRS(lat[i,j], lon[i,j], True, self.l1cConfig.mgrs_tile_precision))
 
         return lat_l1c, lon_l1c, toa_l1c
 
