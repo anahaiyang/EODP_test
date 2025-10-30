@@ -1,4 +1,6 @@
+from matplotlib.pyplot import ylabel
 
+from ism.ism_test.ism_test import toa_isrf
 # LEVEL-1B MODULE
 
 from l1b.src.initL1b import initL1b
@@ -48,6 +50,7 @@ class l1b(initL1b):
             # -------------------------------------------------------------------------------
             writeToa(self.outdir, self.globalConfig.l1b_toa + band, toa)
             self.plotL1bToa(toa, self.outdir, band)
+            self.plotCompL1BISRFtoa(toa, self.indir, self.outdir, band)
 
             self.logger.info("End of BAND " + band)
 
@@ -83,3 +86,18 @@ class l1b(initL1b):
     def plotL1bToa(self, toa_l1b, outputdir, band):
         #TODO
         a=1 # dummy
+
+    def plotCompL1BISRFtoa(self, toa_l1b, indir, outputdir, band):
+        toa_isrf = readToa(indir, "ism_toa_isrf_"+band+".nc")
+        ALT_pos = int(toa_l1b.shape[0]/2)
+
+        plt.figure(figsize=(11,7))
+        plt.plot(toa_isrf[ALT_pos,:], color="blue")
+        plt.plot(toa_l1b[ALT_pos,:], color="red")
+        plt.title("L1B vs ISRF TOA comparison")
+        plt.xlabel("ACT pixel [-]")
+        plt.ylabel("TOA [mW/m2/sr]")
+        plt.grid(True)
+        plt.legend()
+
+        plt.savefig(f"{outputdir}/Comp_L1B_ISRF_toa_{band}.png", dpi=300)
